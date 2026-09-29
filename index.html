@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Não Carregues</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+        }
+        #btn-perigoso {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #btn-perigoso:hover {
+            background-color: #0056b3;
+        }
+        #btn-perigoso:active {
+            transform: scale(0.95);
+        }
+        #emoji-container {
+            font-size: 120px;
+            margin-top: 30px;
+            min-height: 150px; /* Evita que o botão salte quando o emoji aparece */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="btn-perigoso">Não carregues</button>
+    <div id="emoji-container"></div>
+
+    <script>
+        let jaClicou = false;
+
+        // Função para gerar um som de "pum" usando a Web Audio API do navegador
+        // Assim não precisamos de ficheiros de áudio externos (.mp3)
+        function tocarSomDePum() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return; // Fallback se o browser não suportar
+            
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sawtooth'; // Tipo de onda áspera
+            osc.frequency.setValueAtTime(60, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 0.4);
+
+            gain.gain.setValueAtTime(1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.5);
+        }
+
+        document.getElementById('btn-perigoso').addEventListener('click', function() {
+            if (!jaClicou) {
+                // Primeira vez
+                tocarSomDePum();
+                document.getElementById('emoji-container').innerText = '💩';
+                jaClicou = true;
+            } else {
+                // Segunda vez em diante
+                alert('Aviso de cobrança: 299€ foram debitados da sua conta por desobedecer!');
+            }
+        });
+    </script>
+</body>
+</html>
